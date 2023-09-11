@@ -41,7 +41,7 @@ def get_parser() -> ArgumentParser:
         type=str,
         required=False,
         help="Task type.",
-        default="classification",
+        default="segmentation",
         choices=["classification", "detection", "segmentation"],
     )
     parser.add_argument(
