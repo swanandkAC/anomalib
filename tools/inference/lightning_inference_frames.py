@@ -72,15 +72,17 @@ def infer(args: Namespace):
     transform = get_transforms(
         config=transform_config, image_size=image_size, center_crop=center_crop, normalization=normalization
     )
-    
-    # create the dataset
-    dataset = InferenceDataset(
-        args.input, image_size=tuple(config.dataset.image_size), transform=transform  # type: ignore
-    )
-    dataloader = DataLoader(dataset)
+    import glob
+    li_images = glob.glob(args.input+"\*")
+    for img in li_images:
+        # create the dataset
+        dataset = InferenceDataset(
+            img, image_size=tuple(config.dataset.image_size), transform=transform  # type: ignore
+        )
+        dataloader = DataLoader(dataset)
 
-    # generate predictions
-    trainer.predict(model=model, dataloaders=[dataloader])
+        # generate predictions
+        trainer.predict(model=model, dataloaders=[dataloader])
 
 
 if __name__ == "__main__":
