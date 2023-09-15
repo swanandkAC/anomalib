@@ -46,6 +46,7 @@ class ImageResult:
     anomalous_boxes: np.ndarray = field(init=False)
 
     def __post_init__(self) -> None:
+        print("Visualizer INIT")
         """Generate heatmap overlay and segmentations, convert masks to images."""
         if self.anomaly_map is not None:
             self.heat_map = superimpose_anomaly_map(self.anomaly_map, self.image, normalize=False)
@@ -168,6 +169,7 @@ class Visualizer:
                 visualization.add_image(image=image_result.gt_mask, color_map="gray", title="Ground Truth")
             visualization.add_image(image_result.heat_map, "Predicted Heat Map")
             visualization.add_image(image=image_result.pred_mask, color_map="gray", title="Predicted Mask")
+            print("SEGRESULT")
             visualization.add_image(image=image_result.segmentations, title="Segmentation Result")
         elif self.task == TaskType.CLASSIFICATION:
             visualization.add_image(image_result.image, title="Image")
@@ -202,7 +204,7 @@ class Visualizer:
             return image_with_boxes
         if self.task == TaskType.SEGMENTATION:
             visualization = mark_boundaries(
-                image_result.heat_map, image_result.pred_mask, color=(1, 0, 0), mode="thick"
+                image_result.image, image_result.pred_mask, color=(1, 0, 0), mode="thick"
             )
             return (visualization * 255).astype(np.uint8)
         if self.task == TaskType.CLASSIFICATION:

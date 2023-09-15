@@ -14,7 +14,7 @@ from pathlib import Path
 from anomalib.data.utils import generate_output_image_filename, get_image_filenames, read_image
 from anomalib.deploy import OpenVINOInferencer
 from anomalib.post_processing import Visualizer
-
+import cv2
 
 def get_parser() -> ArgumentParser:
     """Get parser.
@@ -25,8 +25,8 @@ def get_parser() -> ArgumentParser:
     parser = ArgumentParser()
     parser.add_argument("--weights", type=Path, required=True, help="Path to model weights")
     parser.add_argument("--metadata", type=Path, required=True, help="Path to a JSON file containing the metadata.")
-    parser.add_argument("--input", type=Path, required=True, help="Path to an image to infer.")
-    parser.add_argument("--output", type=Path, required=False, help="Path to save the output image.")
+    parser.add_argument("--input", type=Path, required=True, help="Path to a video to infer.")
+    parser.add_argument("--output", type=Path, required=False, help="Path to save the output .")
     parser.add_argument(
         "--task",
         type=str,
@@ -40,7 +40,7 @@ def get_parser() -> ArgumentParser:
         type=str,
         required=False,
         help="Hardware device on which the model will be deployed",
-        default="GPU",
+        default="CPU",
         choices=["CPU", "GPU", "VPU"],
     )
     parser.add_argument(
@@ -72,10 +72,14 @@ def infer(args: Namespace) -> None:
     # Get the inferencer.
     inferencer = OpenVINOInferencer(path=args.weights, metadata=args.metadata, device=args.device)
     visualizer = Visualizer(mode=args.visualization_mode, task=args.task)
+    out = cv2.VideoWriter(str(args.output),cv2.VideoWriter_fourcc(*'DIVX'), 25, (1920,1200))
 
-    filenames = get_image_filenames(path=args.input)
-    for filename in filenames:
-        image = read_image(filename)
+    #filenames = get_image_filenames(path=args.input)
+    cap = cv2.VideoCapture(str(args.input))
+    frame_array = []
+    while True:
+        _, image = cap.read()
+        #image = read_image(filename)
         predictions = inferencer.predict(image=image)
         output = visualizer.visualize_image(predictions)
 
@@ -85,13 +89,17 @@ def infer(args: Namespace) -> None:
             )
 
         if args.output:
-            file_path = generate_output_image_filename(input_path=filename, output_path=args.output)
-            visualizer.save(file_path=file_path, image=output)
+            #file_path = generate_output_image_filename(input_path=filename, output_path=args.output)
+            #visualizer.save(file_path=file_path, image=output)
+            height, width, layers = output.shape
+            size = (width,height)
+            print(size)
+            out.write(output)
+            
 
         # Show the image in case the flag is set by the user.
         if args.show:
             visualizer.show(title="Output Image", image=output)
-
 
 if __name__ == "__main__":
     args = get_parser().parse_args()

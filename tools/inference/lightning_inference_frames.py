@@ -10,7 +10,7 @@ from pytorch_lightning import Trainer
 from torch.utils.data import DataLoader
 
 from anomalib.config import get_configurable_parameters
-from anomalib.data.inference import InferenceDataset
+from anomalib.data.inference import InferenceDataset                                                                                                                 
 from anomalib.data.utils import InputNormalizationMethod, get_transforms
 from anomalib.models import get_model
 from anomalib.utils.callbacks import get_callbacks
@@ -73,7 +73,8 @@ def infer(args: Namespace):
         config=transform_config, image_size=image_size, center_crop=center_crop, normalization=normalization
     )
     import glob
-    li_images = glob.glob(args.input+"\*")
+    import os
+    li_images = glob.glob(os.path.join(args.input,"*"))
     for img in li_images:
         # create the dataset
         dataset = InferenceDataset(

@@ -6,7 +6,7 @@ dataset:
   mask_dir: E:\Accurate\BHEL_ANNOTATION\Shreyas_Annotations\BHEL_1\wire\mask #optional
   extensions: null
   normal_test_dir: null # optional
-  category: wire
+  category: wire2
   normal_dir: good # name of the folder containing normal images.
   abnormal_dir: tear # name of the folder containing abnormal images.
   train_batch_size: 32
